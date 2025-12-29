@@ -1,6 +1,7 @@
+import { Request, Response } from "express";
 import User from "../models/User";
 
-const createAccount = async(req, res) => {
+const createAccount = async(req: Request, res: Response) => {
     const user = new User(req.body);
 
     try {
