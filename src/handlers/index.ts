@@ -40,7 +40,19 @@ const createAccount = async(req: Request, res: Response) => {
 };
 
 const login = async(req: Request, res: Response) => {
+    let result = validationResult(req);
 
+    if(!result.isEmpty()){
+        return res.status(400).json({errors: result.array()});
+    }
+
+    const { email, password } = req.body;
+    const emailExist = await User.findOne({ email });
+
+    if(!emailExist){
+        const error = new Error('Usuario no existe');
+        return res.status(404).json({msg: error.message, error: true});
+    }
 }
 
 
