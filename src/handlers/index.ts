@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import slug from "slug";
 import User from "../models/User";
 import hashPassword from "../utils/auth";
 
@@ -7,12 +8,21 @@ const createAccount = async(req: Request, res: Response) => {
     const emailExist = await User.findOne({ email });
 
     if(emailExist){
-        const error = new Error('Usuario ya registrado');
+        const error = new Error('Email de usuario ya registrado');
+        return res.status(409).json({msg: error.message, error: true});
+    }
+
+    const handle = slug(req.body.handle, '');
+    const handleExist = await User.findOne({ handle });
+
+    if(handleExist){
+        const error = new Error('Nombre de usuario no disponible');
         return res.status(409).json({msg: error.message, error: true});
     }
     
     const user = new User(req.body);
     user.password = await hashPassword(password);
+    user.handle = handle;
     
     try {
         await user.save();
