@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import slug from "slug";
 import { validationResult } from "express-validator";
 import User from "../models/User";
-import hashPassword from "../utils/auth";
+import hashPassword, { checkPassword } from "../utils/auth";
 
 const createAccount = async(req: Request, res: Response) => {
     let result = validationResult(req);
@@ -47,12 +47,21 @@ const login = async(req: Request, res: Response) => {
     }
 
     const { email, password } = req.body;
-    const emailExist = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-    if(!emailExist){
+    if(!user){
         const error = new Error('Usuario no existe');
         return res.status(404).json({msg: error.message, error: true});
     }
+
+    const isPasswordCorrect = await checkPassword(password, user.password);
+
+    if(!isPasswordCorrect){
+        const error = new Error('Password incorrecto');
+        return res.status(401).json({msg: error.message, error: true});
+    }
+
+    res.status(200).send('Autenticado...');
 }
 
 
