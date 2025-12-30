@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import User from "../models/User";
+import hashPassword from "../utils/auth";
 
 const createAccount = async(req: Request, res: Response) => {
-    const { email } = req.body;
+    const { email, password } = req.body;
     const emailExist = await User.findOne({ email });
 
     if(emailExist){
@@ -11,6 +12,7 @@ const createAccount = async(req: Request, res: Response) => {
     }
     
     const user = new User(req.body);
+    user.password = await hashPassword(password);
     
     try {
         await user.save();
