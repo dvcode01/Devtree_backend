@@ -49,9 +49,8 @@ const login = async(req: Request, res: Response) => {
         return res.status(401).json({msg: error.message, error: true});
     }
 
-    generateJWT(user);
-
-    res.status(200).send('Autenticado...');
+    const token = generateJWT({id: user._id, handle: user.handle, email: user.email});
+    res.status(200).send(token);
 }
 
 
