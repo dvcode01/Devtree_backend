@@ -54,8 +54,7 @@ const login = async(req: Request, res: Response) => {
 }
 
 const getUser = (req: Request, res: Response) => {
-    console.log('Desde GetUser');
-    console.log(req.user);
+    res.json(req.user);
 }
 
 
