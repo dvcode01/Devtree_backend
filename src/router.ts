@@ -2,6 +2,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import { createAccount, login, getUser } from "./handlers";
 import handleInputErrors from "./middleware/validation";
+import authenticate from "./middleware/auth";
 
 const router = Router();
 
@@ -30,6 +31,6 @@ router.post('/auth/login',
         .withMessage('El Password es obligatorio')
     , handleInputErrors, login);
 
-router.get('/user', getUser);
+router.get('/user', authenticate, getUser);
 
 export default router;
