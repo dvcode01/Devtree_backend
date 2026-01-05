@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import slug from "slug";
+import { verify } from "jsonwebtoken";
 import User from "../models/User";
 import hashPassword, { checkPassword } from "../utils/auth";
 import generateJWT from "../utils/jwt";
@@ -49,12 +50,47 @@ const login = async(req: Request, res: Response) => {
         return res.status(401).json({msg: error.message, error: true});
     }
 
-    const token = generateJWT({id: user._id, handle: user.handle, email: user.email});
+    const token = generateJWT({id: user._id});
     res.status(200).send(token);
+}
+
+const getUser = async(req: Request, res: Response) => {
+    const bearer = req.headers.authorization;
+
+    if(!bearer){
+        const error = new Error('No Autorizado');
+        return res.status(401).json({error: error.message});
+    }
+
+    const [, token] = bearer.split(' ');
+    
+    if(!token){
+        const error = new Error('No Autorizado');
+        return res.status(401).json({error: error.message});
+    }
+
+    try {
+        const result = verify(token, process.env.SECRET_JWT);
+        
+        if(typeof result === 'object' && result.id){
+            const user = await User.findById(result.id).select('handle nombre email');
+
+            if(!user){
+                const error = new Error('El usuario no existe');
+                return res.status(404).json({error: error.message});
+            }
+
+            res.json(user);
+        }
+        
+    } catch (error) {
+        res.status(500).json({error: 'Token no valido'});
+    }
 }
 
 
 export {
     createAccount,
-    login
+    login,
+    getUser
 }
