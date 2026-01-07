@@ -29,7 +29,7 @@ const authenticate = async(req: Request, res: Response, next: NextFunction) => {
         const result = verify(token, process.env.SECRET_JWT);
         
         if(typeof result === 'object' && result.id){
-            const user = await User.findById(result.id).select('handle nombre email');
+            const user = await User.findById(result.id).select('-password -__v');
 
             if(!user){
                 const error = new Error('El usuario no existe');
