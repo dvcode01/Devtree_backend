@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import slug from "slug";
+import formidable from 'formidable';
+import cloudinary from "../config/cloud";
 import User from "../models/User";
 import hashPassword, { checkPassword } from "../utils/auth";
 import generateJWT from "../utils/jwt";
@@ -81,10 +83,23 @@ const updateProfile = async (req: Request, res: Response) => {
 
 };
 
+const uploadImageProfile = async(req: Request, res: Response) => {
+    const form = formidable({multiples: false});
+    
+    try {
+        console.log('desde subir imagen...');
+
+    } catch (e) {
+        const error = new Error('Hubo un error al subir la imagen');
+        return res.status(500).json({error: error.message});
+    }
+};
+
 
 export {
     createAccount,
     login,
     getUser,
-    updateProfile
+    updateProfile,
+    uploadImageProfile
 }
