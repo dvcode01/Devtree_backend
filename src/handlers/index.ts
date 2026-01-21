@@ -111,11 +111,30 @@ const uploadImageProfile = async(req: Request, res: Response) => {
     }
 };
 
+const getUserByHandle = async(req: Request, res: Response) => {
+    const { handle } = req.params; 
+    try {
+        const user = await User.findOne({ handle }).select('-_id -__v -email -password');
+
+        if(!user){
+           const error = new Error('El Usuario no existe');
+           return res.status(404).json({error: error.message}); 
+        }
+
+        res.json(user);
+    } catch (e) {
+        const error = new Error('Hubo un error');
+        return res.status(500).json({error: error.message});
+    }
+
+};
+
 
 export {
     createAccount,
     login,
     getUser,
     updateProfile,
-    uploadImageProfile
+    uploadImageProfile,
+    getUserByHandle
 }
